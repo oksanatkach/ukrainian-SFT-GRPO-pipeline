@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from hydra.core.config_store import ConfigStore
 from config.lora import LoRAConfig, LoRASmall
@@ -17,13 +17,13 @@ from config.custom_metrics import (CustomMetricsConfig,
 @dataclass
 class MainConfig:
     # Nested groups
-    lora: LoRAConfig = LoRAConfig()
-    quantization: QuantizationConfig = QuantizationConfig()
-    sft_train: SFTConfig = SFTConfig()
-    grpo_train: GRPOConfig = GRPOConfig()
-    run: RunConfig = RunConfig()
-    dataset: DatasetConfig = DatasetConfig()
-    custom_metrics: CustomMetricsConfig = CustomMetricsConfig()
+    lora: LoRAConfig = field(default_factory=LoRAConfig)
+    quantization: QuantizationConfig = field(default_factory=QuantizationConfig)
+    sft_train: SFTConfig = field(default_factory=SFTConfig)
+    grpo_train: GRPOConfig = field(default_factory=GRPOConfig)
+    run: RunConfig = field(default_factory=RunConfig)
+    dataset: DatasetConfig = field(default_factory=DatasetConfig)
+    custom_metrics: CustomMetricsConfig = field(default_factory=CustomMetricsConfig)
 
     model_name: str = "google/gemma-3-1b-pt"
     wandb_project_name: str = "gemma_FST"
