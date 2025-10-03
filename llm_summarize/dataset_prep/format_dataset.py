@@ -1,0 +1,81 @@
+from datasets import load_dataset, Dataset
+from transformers import AutoTokenizer
+from typing import Tuple
+import logging
+
+
+log = logging.getLogger(__name__)
+
+def formatting_func(row, tokenizer, max_length=2048, special_tokens_buffer=5):
+    prompt_text = (
+        "Коротко підсумуй цей текст:\n"
+        f"{row['text']}\n\n"
+    )
+    completion_text = f"Підсумок тексту: {row['summary']}"
+
+    prompt_ids = tokenizer(text=prompt_text, add_special_tokens=False)["input_ids"]
+    completion_ids = tokenizer(text=completion_text, add_special_tokens=False)["input_ids"]
+
+    # Truncate prompt if needed
+    if len(prompt_ids) + len(completion_ids) > (max_length - special_tokens_buffer):
+        max_prompt_length = max_length - len(completion_ids) - special_tokens_buffer
+        prompt_ids = prompt_ids[:max_prompt_length]
+
+    # Concatenate
+    input_ids = prompt_ids + completion_ids
+    completion_mask = [0] * len(prompt_ids) + [1] * len(completion_ids)
+
+    # Return tokenized data (SFTTrainer will detect "input_ids" and skip tokenization)
+    return {
+        "input_ids": input_ids,
+        "completion_mask": completion_mask,
+        "prompt_text": prompt_text,
+        "prompt_ids": prompt_ids
+    }
+
+def format_ds(dataset: Dataset,
+              tokenizer: AutoTokenizer,
+              max_token_length: int,
+              special_tokens_buffer: int,
+              cpu_workers: int = 1):
+    return dataset.map(
+        formatting_func,
+        fn_kwargs={"tokenizer": tokenizer,
+                   "max_length": max_token_length,
+                   "special_tokens_buffer": special_tokens_buffer
+                   },
+        remove_columns=["title", "text"],
+        num_proc=cpu_workers
+    )
+
+def format_ds_for_GRPO(dataset: Dataset, cpu_workers: int = 1):
+    '''
+    GRPO doesn't need the completion, so we simply map prompt_ids to input_ids.
+    This avoids another tokenization run.
+    '''
+    return dataset.map(
+        lambda row: {"input_ids": row["prompt_ids"]},
+        remove_columns=["prompt_ids", "completion_mask", "prompt_text"],
+        num_proc=cpu_workers
+    )
+
+def get_dataset(dataset_name: str,
+                tokenizer: AutoTokenizer,
+                max_token_length: int,
+                special_tokens_buffer: int,
+                cpu_workers: int) -> Tuple[Dataset, Dataset]:
+    try:
+        train_dataset = load_dataset(dataset_name, "ukrainian", split="train")
+        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation")
+    except Exception as e:
+        log.error(f"Failed to load model: {e}")
+        raise  # critical, cannot continue
+
+    # a neater and more concise way to pass arguments
+    kwargs = locals().copy()
+    kwargs.pop("dataset_name")
+
+    return (
+        format_ds(dataset=train_dataset, **kwargs),
+        format_ds(dataset=eval_dataset, **kwargs),
+    )
