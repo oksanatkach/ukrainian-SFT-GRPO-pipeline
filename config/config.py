@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+from omegaconf import OmegaConf
+import torch
 from datetime import datetime
 from hydra.core.config_store import ConfigStore
 from config.lora import LoRAConfig, LoRASmall
@@ -37,6 +39,11 @@ class MainConfig:
 def register_configs():
     """Register all configs with Hydra's ConfigStore"""
     cs = ConfigStore.instance()
+
+    OmegaConf.register_new_resolver(
+        "torch.dtype",
+        lambda dtype_name: getattr(torch, dtype_name)
+    )
 
     # Register main config
     cs.store(name="config", node=MainConfig)
