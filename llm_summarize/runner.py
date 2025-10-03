@@ -6,6 +6,8 @@ import wandb
 from huggingface_hub import login
 
 
+log = logging.getLogger(__name__)
+
 def _init_environment():
     """Authenticate Hugging Face and W&B safely, with logging."""
     hf_key = os.environ.get("HF_KEY")
@@ -41,7 +43,6 @@ def _init_environment():
 
 # Automatically initialize on import
 _init_environment()
-log = logging.getLogger(__name__)
 
 
 def run_pipeline(config: MainConfig) -> None:
