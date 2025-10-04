@@ -1,17 +1,12 @@
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
+from config.SFT_train import SFTConfigBase
 
 @dataclass
-class AdamConfig:
-    optim: Optional[str] = field(
-        default="paged_adamw_8bit",
-        metadata={"help": "The optimizer to use."},
-    )
-    learning_rate: Optional[float] = field(default=2e-4)
-    max_grad_norm: Optional[float] = field(default=1.0)
-    weight_decay: Optional[int] = field(default=0.001)
-
-    lr_scheduler_type: str = field(
-        default="constant",
-        metadata={"help": "Learning rate schedule. Constant a bit better than cosine, and has advantage for analysis"},
-    )
+class AdamOptimizerConfig(SFTConfigBase):
+    """Adam optimizer config - inherits all SFT fields and overrides optimizer params"""
+    optim: str = "paged_adamw_8bit"
+    learning_rate: float = 2e-4
+    max_grad_norm: float = 1.0
+    weight_decay: float = 0.001
+    lr_scheduler_type: str = "constant"
+    # All other fields inherited from SFTConfigBase keep their defaults

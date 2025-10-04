@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, EarlyStoppingCallback
-from custom_sfttrainer import CustomSFTTrainer
+from llm_summarize.SFT.custom_sfttrainer import CustomSFTTrainer
 import wandb
 from hydra.utils import instantiate
 from config.config import MainConfig
@@ -16,11 +16,11 @@ def run_SFT(train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -
     train_config = instantiate(config.sft_train)
 
     model = AutoModelForCausalLM.from_pretrained(
-        config.model_name,
+        config.model.model_name,
         quantization_config=quantization_config,
-        dtype=torch.bfloat16,  # bf16 instead of fp16
-        attn_implementation='eager',
-        device_map="auto",
+        dtype=config.model.dtype,
+        attn_implementation=config.model.attn_implementation,
+        device_map=config.model.device_map
     )
     model.gradient_checkpointing_enable()
 
@@ -32,8 +32,8 @@ def run_SFT(train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -
     )
 
     early_stopping_callback = EarlyStoppingCallback(
-        early_stopping_patience=train_config.early_stopping_patience,
-        early_stopping_threshold=train_config.early_stopping_threshold,
+        early_stopping_patience=config.early_stopping.early_stopping_patience,
+        early_stopping_threshold=config.early_stopping.early_stopping_threshold,
     )
 
     trainer = CustomSFTTrainer(

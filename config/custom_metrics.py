@@ -11,6 +11,7 @@ class CustomMetricsConfig:
     bleu: bool = True
     bert_score_f1: bool = False
 
+@dataclass
 class CustomMetricsROUGEConfig:
     custom_eval_sample_size: int = 500
     rouge_1: bool = True
@@ -20,6 +21,7 @@ class CustomMetricsROUGEConfig:
     bleu: bool = False
     bert_score_f1: bool = False
 
+@dataclass
 class CustomMetricsBLEUConfig:
     custom_eval_sample_size: int = 500
     rouge_1: bool = False
@@ -29,6 +31,7 @@ class CustomMetricsBLEUConfig:
     bleu: bool = True
     bert_score_f1: bool = False
 
+@dataclass
 class CustomMetricsFullConfig:
     custom_eval_sample_size: int = 500
     rouge_1: bool = True

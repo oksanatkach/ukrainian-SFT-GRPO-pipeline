@@ -1,0 +1,11 @@
+defaults:
+  - model: default
+  - dataset: default
+  - lora: default
+  - quantization: default
+  - sft_train: adam
+  - grpo_train: default
+  - run: default
+  - early_stopping: default
+  - custom_metrics: default
+  - _self_  # Keep overrides from this file last

@@ -50,12 +50,12 @@ def run_pipeline(config: MainConfig) -> None:
     set_seed(config.seed)
 
     # 1) Data preparation
-    log.info(f"Loading tokenizer {config.model_name}")
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+    log.info(f"Loading tokenizer {config.model.model_name}")
+    tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
     log.info(f"Formatting dataset {config.dataset.dataset_name}")
-    from dataset_prep import format_dataset
+    from llm_summarize.dataset_prep import format_dataset
     train_dataset_formatted, eval_dataset_formatted = format_dataset.get_dataset(
         tokenizer=tokenizer,
         dataset_name=config.dataset.dataset_name,
@@ -66,9 +66,9 @@ def run_pipeline(config: MainConfig) -> None:
 
     # 2) SFT
     if config.run.do_sft:
-        log.info(f"Initializing SFT on model {config.model_name}")
+        log.info(f"Initializing SFT on model {config.model.model_name}")
 
-        if config.best_fst_model != "???":
+        if config.best_fst_model:
             log.warning("You specify SFT model for alignment but also call SFT, best SFT model path will be rewritten")
 
         from llm_summarize.SFT import run_SFT
@@ -87,7 +87,7 @@ def run_pipeline(config: MainConfig) -> None:
         log.info(f"Aligning model {config.best_fst_model}")
 
         from llm_summarize.alignment import run_GRPO
-        from dataset_prep.format_dataset import format_ds_for_GRPO
+        from llm_summarize.dataset_prep.format_dataset import format_ds_for_GRPO
 
         grpo_dataset = format_ds_for_GRPO(dataset=train_dataset_formatted, cpu_workers=config.cpu_workers)
 
@@ -96,6 +96,3 @@ def run_pipeline(config: MainConfig) -> None:
                                           dataset=grpo_dataset,
                                           config=config)
         log.info(f"Finished alignment, final model path:\t{config.best_grpo_model}")
-
-if __name__ == "__main__":
-    main()
