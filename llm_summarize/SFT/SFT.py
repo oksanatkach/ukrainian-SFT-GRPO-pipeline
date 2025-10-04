@@ -18,7 +18,7 @@ def run_SFT(train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -
     model = AutoModelForCausalLM.from_pretrained(
         config.model.model_name,
         quantization_config=quantization_config,
-        dtype=config.model.dtype,
+        torch_dtype=config.model.dtype,
         attn_implementation=config.model.attn_implementation,
         device_map=config.model.device_map
     )
