@@ -45,7 +45,7 @@ def format_ds(dataset: Dataset,
                    "max_length": max_seq_length,
                    "special_tokens_buffer": special_tokens_buffer
                    },
-        remove_columns=["title", "text"],
+        remove_columns=["title", "text", "url"],
         num_proc=cpu_workers
     )
 
@@ -55,8 +55,8 @@ def format_ds_for_GRPO(dataset: Dataset, cpu_workers: int = 1):
     This avoids another tokenization run.
     '''
     return dataset.map(
-        lambda row: {"input_ids": row["prompt_ids"]},
-        remove_columns=["prompt_ids", "completion_mask", "prompt_text"],
+        lambda row: {"prompt": row["prompt_text"]},
+        remove_columns=["prompt_ids", "completion_mask", "input_ids"],
         num_proc=cpu_workers
     )
 

@@ -50,7 +50,8 @@ def run_SFT(train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -
     # The best model is now automatically loaded in trainer.model
     # Saving to your final output location for the alignment stage
     final_model_path = f"{config.sft_train.output_dir}/final_best_model"
-    trainer.save_model(final_model_path)
+    model = model.merge_and_unload()
+    model.save_pretrained(final_model_path)
 
     print("SFT is done.")
     print(f"Best model saved to: {final_model_path}")

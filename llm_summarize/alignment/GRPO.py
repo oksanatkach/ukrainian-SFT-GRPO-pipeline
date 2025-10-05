@@ -7,20 +7,22 @@ from hydra.utils import instantiate
 
 
 def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
-    model = AutoModelForCausalLM.from_pretrained(best_model_path)
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
     tokenizer.pad_token_id = tokenizer.eos_token_id
+    tokenizer.padding_side = "left"
+    tokenizer.chat_template = "{{ messages[0]['content'] }}"
 
-    lora_config = instantiate(config.lora)
     training_args = instantiate(config.grpo_train)
+
     classifiers = ToxicityClassifiers()
 
+    # todo: peft_config vs model config vs merged model?
     trainer = GRPOTrainer(
-        model=model,
+        model=best_model_path,
         reward_funcs=[classifiers.get_rewards_classifier_1, classifiers.get_rewards_classifier_2],
         args=training_args,
         train_dataset=dataset,
-        peft_config=lora_config,
+        processing_class=tokenizer
     )
 
     trainer.train()
