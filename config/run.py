@@ -3,5 +3,5 @@ from typing import Optional
 
 @dataclass
 class RunConfig:
-    do_sft: Optional[bool] = True
+    do_sft: Optional[bool] = False
     do_align: Optional[bool] = True

@@ -32,7 +32,7 @@ class SFTConfigBase:
     eval_steps: int = 500
     eval_strategy: str  = "steps"
     logging_strategy: str  = "steps"
-    report_to: List[str] = field(default_factory=lambda: ["wandb"])
+    report_to: List[str] = "wandb"
     logging_first_step: bool = True
 
     # Model selection parameters:

@@ -35,7 +35,7 @@ class MainConfig:
     wandb_run_name: str = f"run_{datetime.now():%Y%m%d_%H%M%S}"
     seed: int = 42
     cpu_workers: int = 1
-    best_fst_model: Optional[str] = None
+    best_fst_model: Optional[str] = "./outputs/SFT"
     best_grpo_model: Optional[str] = None
 
 

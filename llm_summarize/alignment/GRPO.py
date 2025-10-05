@@ -16,7 +16,6 @@ def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
 
     classifiers = ToxicityClassifiers()
 
-    # todo: peft_config vs model config vs merged model?
     trainer = GRPOTrainer(
         model=best_model_path,
         reward_funcs=[classifiers.get_rewards_classifier_1, classifiers.get_rewards_classifier_2],
