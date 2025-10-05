@@ -1,5 +1,4 @@
-from nltk.draw import cfg
-from vllm import LLM
+from vllm import LLM, TokensPrompt
 from typing import List
 from config.reward_classifier import RewardClassifierConfig
 
@@ -20,7 +19,7 @@ class ToxicityClassifiers:
 
     def get_rewards(self, classifier: LLM, completions: List[str]) -> List[float]:
         # todo: classify or reward?
-        input_ids = classifier.get_tokenizer().encode(completions, max_length=self.cfg.max_model_len)
+        input_ids = classifier.get_tokenizer()(completions, max_length=self.cfg.max_model_len, truncation=True)
         output = classifier.classify(input_ids)
         output = [el.outputs.probs for el in output]
         return [el[0] - el[1] for el in output]
