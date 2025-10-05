@@ -1,3 +1,4 @@
+import torch
 from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer
 from typing import Tuple
@@ -27,10 +28,10 @@ def formatting_func(row, tokenizer, max_length=2048, special_tokens_buffer=5):
 
     # Return tokenized data (SFTTrainer will detect "input_ids" and skip tokenization)
     return {
-        "input_ids": input_ids,
-        "completion_mask": completion_mask,
+        "input_ids": torch.tensor(input_ids),
+        "completion_mask": torch.tensor(completion_mask),
         "prompt_text": prompt_text,
-        "prompt_ids": prompt_ids
+        "prompt_ids": torch.tensor(prompt_ids)
     }
 
 def format_ds(dataset: Dataset,
