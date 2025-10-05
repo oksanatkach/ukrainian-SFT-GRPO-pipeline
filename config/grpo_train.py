@@ -13,12 +13,12 @@ class GRPOConfig:
     optim = "adamw_torch_fused"
     learning_rate: float = 1e-6
 
-    per_device_train_batch_size: int = 1
+    per_device_train_batch_size: int = 2
     gradient_accumulation_steps: int = 8
     per_device_eval_batch_size: int = 1
 
     # generation params
-    num_generations: int = 4
+    num_generations: int = 2
     temperature: float = 0.9
     max_completion_length: int = 256
     max_prompt_length: int = 512
