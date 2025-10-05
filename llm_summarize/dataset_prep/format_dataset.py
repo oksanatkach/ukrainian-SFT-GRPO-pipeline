@@ -35,13 +35,13 @@ def formatting_func(row, tokenizer, max_length=2048, special_tokens_buffer=5):
 
 def format_ds(dataset: Dataset,
               tokenizer: AutoTokenizer,
-              max_token_length: int,
+              max_seq_length: int,
               special_tokens_buffer: int,
               cpu_workers: int = 1):
     return dataset.map(
         formatting_func,
         fn_kwargs={"tokenizer": tokenizer,
-                   "max_length": max_token_length,
+                   "max_length": max_seq_length,
                    "special_tokens_buffer": special_tokens_buffer
                    },
         remove_columns=["title", "text"],
@@ -61,7 +61,7 @@ def format_ds_for_GRPO(dataset: Dataset, cpu_workers: int = 1):
 
 def get_dataset(dataset_name: str,
                 tokenizer: AutoTokenizer,
-                max_token_length: int,
+                max_seq_length: int,
                 special_tokens_buffer: int,
                 cpu_workers: int) -> Tuple[Dataset, Dataset]:
     # a neater and more concise way to pass arguments

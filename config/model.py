@@ -8,6 +8,3 @@ class ModelConfig:
     dtype: str = "bfloat16"
     attn_implementation: str =  "eager" # "sdpa", "flash_attention_2"
     device_map: Any = "auto"
-
-    def __post_init__(self):
-        self.dtype = getattr(torch, self.dtype)

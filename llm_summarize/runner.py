@@ -59,7 +59,7 @@ def run_pipeline(config: MainConfig) -> None:
     train_dataset_formatted, eval_dataset_formatted = format_dataset.get_dataset(
         tokenizer=tokenizer,
         dataset_name=config.dataset.dataset_name,
-        max_token_length=config.dataset.max_token_length,
+        max_seq_length=config.dataset.max_seq_length,
         special_tokens_buffer=config.dataset.special_tokens_buffer,
         cpu_workers=config.cpu_workers
     )
