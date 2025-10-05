@@ -18,9 +18,10 @@ class ToxicityClassifiers:
             max_model_len=self.cfg.max_model_len
         )
 
-    @ staticmethod
-    def get_rewards(classifier: LLM, completions: List[str]) -> List[float]:
-        output = classifier.classify(completions)
+    def get_rewards(self, classifier: LLM, completions: List[str]) -> List[float]:
+        # todo: classify or reward?
+        input_ids = classifier.get_tokenizer().encode(completions, max_length=self.cfg.max_model_len)
+        output = classifier.classify(input_ids)
         output = [el.outputs.probs for el in output]
         return [el[0] - el[1] for el in output]
 

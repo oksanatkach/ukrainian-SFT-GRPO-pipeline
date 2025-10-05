@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer
 from datasets import Dataset
 from trl import GRPOTrainer
 from llm_summarize.alignment.reward_functions import ToxicityClassifiers
