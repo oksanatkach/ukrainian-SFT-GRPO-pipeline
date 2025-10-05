@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class CustomMetricsConfig:
     custom_eval_sample_size: int = 500
+    max_new_tokens: int = 256
     rouge_1: bool = True
     rouge_2: bool = True
     rouge_l: bool = True
@@ -14,6 +15,7 @@ class CustomMetricsConfig:
 @dataclass
 class CustomMetricsROUGEConfig:
     custom_eval_sample_size: int = 500
+    max_new_tokens: int = 256
     rouge_1: bool = True
     rouge_2: bool = True
     rouge_l: bool = True
@@ -24,6 +26,7 @@ class CustomMetricsROUGEConfig:
 @dataclass
 class CustomMetricsBLEUConfig:
     custom_eval_sample_size: int = 500
+    max_new_tokens: int = 256
     rouge_1: bool = False
     rouge_2: bool = False
     rouge_l: bool = False
@@ -34,6 +37,7 @@ class CustomMetricsBLEUConfig:
 @dataclass
 class CustomMetricsFullConfig:
     custom_eval_sample_size: int = 500
+    max_new_tokens: int = 256
     rouge_1: bool = True
     rouge_2: bool = True
     rouge_l: bool = True

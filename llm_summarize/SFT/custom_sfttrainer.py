@@ -102,7 +102,7 @@ class CustomSFTTrainer(SFTTrainer):
             with torch.no_grad():
                 generated_ids = self.model.generate(
                     input_ids=prompts_tensor,
-                    max_new_tokens=self.args.max_length
+                    max_new_tokens=self.custom_metrics_args.max_new_tokens
                 )
             pred_ids = generated_ids[:, prompts_tensor.shape[1]:]
             preds = self.processing_class.batch_decode(pred_ids, skip_special_tokens=True)
@@ -110,32 +110,32 @@ class CustomSFTTrainer(SFTTrainer):
             all_preds.extend(preds)
             all_labels.extend(batch['labels'])
 
-        if any([self.custom_metrics_args.custom_metrics.rouge_l,
-                self.custom_metrics_args.custom_metrics.rouge_1,
-                self.custom_metrics_args.custom_metrics.rouge_2]):
+        if any([self.custom_metrics_args.rouge_l,
+                self.custom_metrics_args.rouge_1,
+                self.custom_metrics_args.rouge_2]):
             rouge_scores = rouge.compute(predictions=all_preds, references=all_labels)
-            if self.custom_metrics_args.custom_metrics.rouge_l:
+            if self.custom_metrics_args.rouge_l:
                 output.metrics.update({
                     "eval_rouge_l": rouge_scores["rougeL"].item()
                 })
-            if self.custom_metrics_args.custom_metrics.rouge_1:
+            if self.custom_metrics_args.rouge_1:
                 output.metrics.update({
                     "eval_rouge_1": rouge_scores["rouge1"].item()
                 })
-            if self.custom_metrics_args.custom_metrics.rouge_2:
+            if self.custom_metrics_args.rouge_2:
                 output.metrics.update({
                     "eval_rouge_2": rouge_scores["rouge2"].item()
                 })
-            if self.custom_metrics_args.custom_metrics.rouge_lsum:
+            if self.custom_metrics_args.rouge_lsum:
                 output.metrics.update({
                     "eval_rouge_2": rouge_scores["rougeLsum"].item()
                 })
-        if self.custom_metrics_args.custom_metrics.bleu:
+        if self.custom_metrics_args.bleu:
             bleu_scores = bleu.compute(predictions=all_preds, references=[[label] for label in all_labels])
             output.metrics.update({
                 "eval_bleu": bleu_scores["bleu"]
             })
-        if self.custom_metrics_args.custom_metrics.bert_score_f1:
+        if self.custom_metrics_args.bert_score_f1:
             bert_scores = bertscore.compute(predictions=all_preds, references=all_labels, lang="uk")
             bert_score_f1_mean = np.mean(bert_scores['f1']).item()
             output.metrics.update({
