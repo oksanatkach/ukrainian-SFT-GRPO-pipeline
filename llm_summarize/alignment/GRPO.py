@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from datasets import Dataset
 from trl import GRPOTrainer
-from reward_functions import ToxicityClassifiers
+from llm_summarize.alignment.reward_functions import ToxicityClassifiers
 from config.config import MainConfig
 from hydra.utils import instantiate
 
