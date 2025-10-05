@@ -8,6 +8,7 @@ from config.SFT_train import SFTConfig, SFTConfigBase
 from omegaconf import MISSING
 from config.optimizer import AdamOptimizerConfig
 from config.run import RunConfig
+from config.reward_classifier import RewardClassifierConfig
 from config.grpo_train import GRPOConfig
 from config.model import ModelConfig
 from config.dataset import DatasetConfig
@@ -28,6 +29,7 @@ class MainConfig:
     sft_train: SFTConfigBase = MISSING
     grpo_train: GRPOConfig = field(default_factory=GRPOConfig)
     run: RunConfig = field(default_factory=RunConfig)
+    reward_classifier: RewardClassifierConfig = field(default_factory=RewardClassifierConfig)
     early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
     custom_metrics: CustomMetricsConfig = field(default_factory=CustomMetricsConfig)
 
@@ -66,4 +68,5 @@ def register_configs():
 
     cs.store(group="early_stopping", name="default", node=EarlyStoppingConfig)
     cs.store(group="run", name="default", node=RunConfig)
+    cs.store(group="reward_classifier", name="default", node=RewardClassifierConfig)
     cs.store(group="model", name="default", node=ModelConfig)

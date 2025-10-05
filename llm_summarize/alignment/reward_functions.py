@@ -1,17 +1,21 @@
+from nltk.draw import cfg
 from vllm import LLM
 from typing import List
+from config.reward_classifier import RewardClassifierConfig
 
 class ToxicityClassifiers:
-    def __init__(self):
-        self.toxicity_clf1 = LLM(
-            model="ukr-detect/ukr-toxicity-classifier",
-            task="classify",
-            enforce_eager=True,
-        )
-        self.toxicity_clf2 = LLM(
-            model="textdetox/xlmr-large-toxicity-classifier-v2",
-            task="classify",
-            enforce_eager=True,
+    def __init__(self, cfg: RewardClassifierConfig):
+        self.cfg = cfg
+
+        self.toxicity_clf1 = self.init_model("ukr-detect/ukr-toxicity-classifier")
+        self.toxicity_clf2 = self.init_model("textdetox/xlmr-large-toxicity-classifier-v2")
+
+    def init_model(self, model_name):
+        return LLM(
+            model=model_name,
+            task=self.cfg.task,
+            enforce_eager=self.cfg.enforce_eager,
+            max_model_len=self.cfg.max_model_len
         )
 
     @ staticmethod

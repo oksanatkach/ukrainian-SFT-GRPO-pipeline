@@ -14,7 +14,7 @@ def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
 
     training_args = instantiate(config.grpo_train)
 
-    classifiers = ToxicityClassifiers()
+    classifiers = ToxicityClassifiers(cfg=config.reward_classifier)
 
     trainer = GRPOTrainer(
         model=best_model_path,
