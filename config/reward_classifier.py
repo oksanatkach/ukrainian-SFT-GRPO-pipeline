@@ -4,4 +4,4 @@ from dataclasses import dataclass
 class RewardClassifierConfig:
     task: str = "classify"
     enforce_eager: bool = True
-    max_model_len: int = 512
+    max_input_len: int = 512

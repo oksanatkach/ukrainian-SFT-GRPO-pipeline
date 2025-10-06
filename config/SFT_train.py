@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict
-from trl import SFTConfig as TRLSFTConfig
 from omegaconf import MISSING
 
 
@@ -51,9 +50,3 @@ class SFTConfigBase:
     dataset_text_field: Optional[str] = None
 
     output_dir: str = "./outputs/SFT"
-
-
-@dataclass
-class SFTConfig(SFTConfigBase):
-    """Default SFT config with actual default optimizer values"""
-    defaults: List[str] = field(default_factory=lambda: ["/sft_train/optimizer@_here_: adam"])

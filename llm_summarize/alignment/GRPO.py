@@ -1,9 +1,10 @@
 from transformers import AutoTokenizer
 from datasets import Dataset
-from trl import GRPOTrainer
+from trl import GRPOTrainer, GRPOConfig
 from llm_summarize.alignment.reward_functions import ToxicityClassifiers
 from config.config import MainConfig
 from hydra.utils import instantiate
+from omegaconf import OmegaConf
 
 
 def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
@@ -12,7 +13,10 @@ def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
     tokenizer.padding_side = "left"
     tokenizer.chat_template = "{{ messages[0]['content'] }}"
 
-    training_args = instantiate(config.grpo_train)
+    training_args: GRPOConfig = instantiate(config.grpo_train)
+    model_init_kwargs = OmegaConf.to_container(config.model)
+    model_init_kwargs.pop("model_name")
+    training_args.model_init_kwargs = model_init_kwargs
 
     classifiers = ToxicityClassifiers(cfg=config.reward_classifier)
 
@@ -28,6 +32,6 @@ def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
     final_model_path = f"{config.grpo_train.output_dir}/final_best_model"
     trainer.save_model(final_model_path)
 
-    # todo: sanity check?
+    # todo: sanity check
 
     return final_model_path

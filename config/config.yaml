@@ -4,7 +4,7 @@ defaults:
   - lora: default
   - quantization: default
   - sft_train: adam
-  - grpo_train: default
+  - grpo_train: adam
   - run: default
   - early_stopping: default
   - custom_metrics: default

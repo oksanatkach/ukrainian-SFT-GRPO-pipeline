@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, Any
-import torch
+from typing import Any
 
 @dataclass
 class ModelConfig:

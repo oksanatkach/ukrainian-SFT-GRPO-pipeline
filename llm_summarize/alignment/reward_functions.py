@@ -1,4 +1,4 @@
-from vllm import LLM, TokensPrompt
+from vllm import LLM
 from typing import List
 from config.reward_classifier import RewardClassifierConfig
 
@@ -13,13 +13,11 @@ class ToxicityClassifiers:
         return LLM(
             model=model_name,
             task=self.cfg.task,
-            enforce_eager=self.cfg.enforce_eager,
-            max_model_len=self.cfg.max_model_len
+            enforce_eager=self.cfg.enforce_eager
         )
 
     def get_rewards(self, classifier: LLM, completions: List[str]) -> List[float]:
-        # todo: classify or reward?
-        input_ids = classifier.get_tokenizer()(completions, max_length=self.cfg.max_model_len, truncation=True)
+        input_ids = classifier.get_tokenizer()(completions, max_length=self.cfg.max_input_len, truncation=True)
         output = classifier.classify(input_ids)
         output = [el.outputs.probs for el in output]
         return [el[0] - el[1] for el in output]

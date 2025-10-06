@@ -80,7 +80,7 @@ def run_pipeline(config: MainConfig) -> None:
 
     # 3) Alignment
     if config.run.do_align:
-        if config.best_fst_model == "???":
+        if not config.best_fst_model:
             log.error("ALignment is enabled but best_fst_model path is not in the config")
             raise ValueError("Specify which model to align!")
 

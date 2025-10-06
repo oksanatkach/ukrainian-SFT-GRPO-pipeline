@@ -56,17 +56,22 @@ def run_SFT(train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -
     print("SFT is done.")
     print(f"Best model saved to: {final_model_path}")
 
-    # todo: Quick sanity checks after training
-    test_inputs = [
-        "Long document about AI research...",
-        "Complex technical paper abstract...",
-        "News article about recent events..."
-    ]
+    if config.run.do_sft_sanity_check:
+        from transformers import AutoTokenizer
 
-    for inp in test_inputs:
-        summary = model.generate(inp)
-        print(f"Input: {inp[:100]}...")
-        print(f"Summary: {summary}")
-        print("---")
+        tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
+
+        input_strings = [row['text'] for row in eval_dataset.select(range(3))]
+        test_inputs = [f"Підсумуй цей текст: {el}" for el in input_strings]
+        input_tokens = tokenizer(test_inputs, padding=True, truncation=True, return_tensors='pt', max_length=512)
+        output_tokens = model.generate(**input_tokens, max_new_tokens=132)
+
+        for ind, output in enumerate(output_tokens):
+            prompt_length = input_tokens['input_ids'][ind].shape[0]
+            output_string = tokenizer.decode(output[prompt_length:])
+
+            print(f"Input: {input_strings[ind][:100]}...")
+            print(f"Summary: {output_string}")
+            print("---")
 
     return final_model_path
