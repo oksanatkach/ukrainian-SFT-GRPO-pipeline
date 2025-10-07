@@ -17,7 +17,6 @@ class SFTConfigBase:
     per_device_eval_batch_size: Optional[int] = 8
     gradient_accumulation_steps: Optional[int] = 8
     eval_accumulation_steps: Optional[int] = 4
-    max_seq_length: Optional[int] = None  # max_seq_length is declared in dataset config and handled in dataset_prep
     fp16: Optional[bool] = False # Enables fp16 training
     bf16: Optional[bool] = True # Enables bf16 training
     packing: Optional[bool] = False # Use packing dataset_prep creating
