@@ -7,7 +7,10 @@ class ToxicityClassifiers:
         self.cfg = cfg
 
         self.toxicity_clf1 = self.init_model("ukr-detect/ukr-toxicity-classifier")
+        self.tokenizer_clf1 = self.toxicity_clf1.get_tokenizer()
+
         self.toxicity_clf2 = self.init_model("textdetox/xlmr-large-toxicity-classifier-v2")
+        self.tokenizer_clf2 = self.toxicity_clf2.get_tokenizer()
 
     def init_model(self, model_name):
         return LLM(
@@ -16,8 +19,11 @@ class ToxicityClassifiers:
             enforce_eager=self.cfg.enforce_eager
         )
 
-    def get_rewards(self, classifier: LLM, completions: List[str]) -> List[float]:
-        input_ids = classifier.get_tokenizer()(completions, max_length=self.cfg.max_input_len, truncation=True)
+    def get_rewards(self, classifier: LLM, tokenizer, completions: List[str]) -> List[float]:
+        input_ids = tokenizer(completions,
+                              max_length=self.cfg.max_input_len,
+                              truncation=True,
+                              return_tensors="pt")["input_ids"]
         output = classifier.classify(input_ids)
         output = [el.outputs.probs for el in output]
         return [el[0] - el[1] for el in output]
