@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from datasets import Dataset
-from trl import GRPOTrainer, GRPOConfig
-from peft import PeftModel
+from trl import GRPOTrainer
+from peft import PeftModel, get_peft_model
 from llm_summarize.alignment.reward_functions import ToxicityClassifiers
 from config.config import MainConfig
 from hydra.utils import instantiate
@@ -9,21 +9,19 @@ from llm_summarize.alignment.custom_inference_callback import InferenceCallback
 from llm_summarize.utils import extract_text_from_html
 
 
-def run_GRPO(model: AutoModelForCausalLM,
+def run_GRPO(base_model: AutoModelForCausalLM,
              tokenizer: AutoTokenizer,
              best_checkpoint_path: str,
              dataset: Dataset,
              config: MainConfig) -> str:
 
+    lora_config = instantiate(config.grpo_lora)
+    train_config = instantiate(config.grpo_train)
+
     tokenizer.chat_template = "{{ messages[0]['content'] }}"
 
-    # Load LoRA adapter
-    model = PeftModel.from_pretrained(model, best_checkpoint_path)
-
-    # Merge LoRA weights into base model
-    model = model.merge_and_unload()
-
-    training_args: GRPOConfig = instantiate(config.grpo_train)
+    sft_model = PeftModel.from_pretrained(base_model, best_checkpoint_path)
+    align_model = get_peft_model(sft_model, lora_config)
 
     classifiers = ToxicityClassifiers(cfg=config.reward_classifier)
 
@@ -39,9 +37,9 @@ def run_GRPO(model: AutoModelForCausalLM,
     inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
 
     trainer = GRPOTrainer(
-        model=model,
+        model=align_model,
         reward_funcs=[classifiers.get_rewards_classifier_1, classifiers.get_rewards_classifier_2],
-        args=training_args,
+        args=train_config,
         train_dataset=dataset,
         processing_class=tokenizer,
         callbacks=[inference_callback]

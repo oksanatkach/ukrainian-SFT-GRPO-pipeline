@@ -12,7 +12,7 @@ class LoRAConfig:
     task_type: str = "CAUSAL_LM"
 
 @dataclass
-class LoRASmall:
+class LoRASmallConfig:
     _target_: str = "peft.LoraConfig"
     r: int = 8
     lora_alpha: int = 16

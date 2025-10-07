@@ -1,7 +1,8 @@
 defaults:
   - model: default
   - dataset: default
-  - lora: default
+  - sft_lora: default
+  - grpo_lora: small
   - quantization: default
   - sft_train: adam
   - grpo_train: adam

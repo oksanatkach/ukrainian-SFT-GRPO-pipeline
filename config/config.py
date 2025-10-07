@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 from hydra.core.config_store import ConfigStore
-from config.lora import LoRAConfig, LoRASmall
+from config.lora import LoRAConfig, LoRASmallConfig
 from config.quantization import QuantizationConfig
 from config.SFT_train import SFTConfigBase
 from omegaconf import MISSING
@@ -24,7 +24,8 @@ class MainConfig:
     # Nested groups
     model: ModelConfig = field(default_factory=ModelConfig)
     dataset: DatasetConfig = field(default_factory=DatasetConfig)
-    lora: LoRAConfig = field(default_factory=LoRAConfig)
+    sft_lora: LoRAConfig = field(default_factory=LoRAConfig)
+    grpo_lora: LoRAConfig = field(default_factory=LoRASmallConfig)
     quantization: QuantizationConfig = field(default_factory=QuantizationConfig)
     sft_train: SFTConfigBase = MISSING
     grpo_train: GRPOConfigBase = MISSING
@@ -50,7 +51,7 @@ def register_configs():
 
     # Register model variants
     cs.store(group="lora", name="default", node=LoRAConfig)
-    cs.store(group="lora", name="small", node=LoRASmall)
+    cs.store(group="lora", name="small", node=LoRASmallConfig)
 
     cs.store(group="sft_train", name="default", node=SFTConfigBase)
     cs.store(group="sft_train", name="adam", node=AdamSFTConfig)

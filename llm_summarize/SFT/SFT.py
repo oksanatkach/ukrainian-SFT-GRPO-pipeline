@@ -10,7 +10,7 @@ from datasets import Dataset
 log = logging.getLogger(__name__)
 
 def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -> str:
-    lora_config = instantiate(config.lora)
+    lora_config = instantiate(config.sft_lora)
     train_config = instantiate(config.sft_train)
 
     # Initialize wandb
