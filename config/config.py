@@ -25,7 +25,7 @@ class MainConfig:
     model: ModelConfig = field(default_factory=ModelConfig)
     dataset: DatasetConfig = field(default_factory=DatasetConfig)
     sft_lora: LoRAConfig = field(default_factory=LoRAConfig)
-    grpo_lora: LoRAConfig = field(default_factory=LoRASmallConfig)
+    grpo_lora: LoRASmallConfig = field(default_factory=LoRASmallConfig)
     quantization: QuantizationConfig = field(default_factory=QuantizationConfig)
     sft_train: SFTConfigBase = MISSING
     grpo_train: GRPOConfigBase = MISSING
@@ -50,8 +50,12 @@ def register_configs():
     cs.store(name="config", node=MainConfig)
 
     # Register model variants
-    cs.store(group="lora", name="default", node=LoRAConfig)
-    cs.store(group="lora", name="small", node=LoRASmallConfig)
+    cs.store(group="sft_lora", name="default", node=LoRAConfig)
+    cs.store(group="sft_lora", name="small", node=LoRASmallConfig)
+
+    # grpo_lora group
+    cs.store(group="grpo_lora", name="default", node=LoRAConfig)
+    cs.store(group="grpo_lora", name="small", node=LoRASmallConfig)
 
     cs.store(group="sft_train", name="default", node=SFTConfigBase)
     cs.store(group="sft_train", name="adam", node=AdamSFTConfig)
