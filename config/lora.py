@@ -17,6 +17,9 @@ class LoRASmallConfig:
     r: int = 8
     lora_alpha: int = 16
     lora_dropout: float = 0.05
-    target_modules: List[str] = field(default_factory=lambda: ["q_proj", "k_proj", "v_proj", "o_proj"])
+    target_modules: List[str] = field(default_factory=lambda: [
+        "q_proj", "k_proj", "v_proj", "o_proj",  # Attention layers
+        "gate_proj", "up_proj", "down_proj"       # MLP layers
+    ])
     bias: str = "none"
     task_type: str = "CAUSAL_LM"
