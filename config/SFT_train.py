@@ -27,7 +27,7 @@ class SFTConfigBase:
     save_total_limit: int = 3  # Keep only best 3 checkpoints to save space
     eval_strategy: str  = "steps"
     logging_strategy: str  = "steps"
-    report_to: List[str] = field(default_factory=lambda: ["wandb"])
+    report_to: str = "wandb"
     logging_first_step: bool = True
 
     num_train_epochs: int = 3

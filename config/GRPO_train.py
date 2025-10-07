@@ -36,7 +36,7 @@ class GRPOConfigBase:
     save_total_limit: int = 2
 
     evaluation_strategy: Optional[str] = "no"
-    report_to: List[str] = field(default_factory=lambda: ["wandb"])
+    report_to: str = "wandb"
 
     # can later replace this with params from config.model if passing model path instead of object
     # model_init_kwargs: Optional[Dict] = None
