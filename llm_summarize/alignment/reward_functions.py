@@ -29,7 +29,7 @@ class ToxicityClassifiers:
         return [el[0] - el[1] for el in output]
 
     def get_rewards_classifier_1(self, prompts: List[str], completions: List[str], **kwargs)-> List[float]:
-        return self.get_rewards(self.toxicity_clf1, completions)
+        return self.get_rewards(self.toxicity_clf1, self.tokenizer_clf1, completions)
 
     def get_rewards_classifier_2(self, prompts: List[str], completions: List[str], **kwargs) -> List[float]:
-        return self.get_rewards(self.toxicity_clf2, completions)
+        return self.get_rewards(self.toxicity_clf2, self.tokenizer_clf2, completions)
