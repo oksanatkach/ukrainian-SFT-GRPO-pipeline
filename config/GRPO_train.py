@@ -32,7 +32,6 @@ class GRPOConfigBase:
     save_steps: int = 100
     save_total_limit: int = 2
 
-    evaluation_strategy: Optional[str] = "no"
     report_to: str = "wandb"
 
     # can later replace this with params from config.model if passing model path instead of object
