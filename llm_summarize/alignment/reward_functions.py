@@ -2,6 +2,7 @@ from vllm import LLM
 from typing import List
 from config.reward_classifier import RewardClassifierConfig
 from vllm import TokensPrompt
+import torch
 
 class ToxicityClassifiers:
     def __init__(self, cfg: RewardClassifierConfig):
@@ -20,17 +21,20 @@ class ToxicityClassifiers:
             enforce_eager=self.cfg.enforce_eager
         )
 
-    def get_rewards(self, classifier: LLM, tokenizer, completions: List[str]) -> List[float]:
+    def get_rewards(self, classifier: LLM, tokenizer, completions: List[str], device="cpu") -> torch.Tensor:
         input_ids = tokenizer(completions,
                               max_length=self.cfg.max_input_len,
                               truncation=True)["input_ids"]
-        input = [TokensPrompt(prompt_token_ids=el) for el in input_ids]
-        output = classifier.classify(input)
-        output = [el.outputs.probs for el in output]
-        return [el[0] - el[1] for el in output]
+        tokens_prompts = [TokensPrompt(prompt_token_ids=el) for el in input_ids]
+        output = classifier.classify(tokens_prompts)
+        output_probs = [el.outputs.probs for el in output]
+        rewards = [el[0] - el[1] for el in output_probs]  # list of floats
+        rewards_tensor = torch.tensor(rewards, dtype=torch.float32, device=device)
+        return rewards_tensor
 
-    def get_rewards_classifier_1(self, prompts: List[str], completions: List[str], **kwargs)-> List[float]:
-        return self.get_rewards(self.toxicity_clf1, self.tokenizer_clf1, completions)
+    def get_rewards_classifier_1(self, prompts: List[str], completions: List[str], **kwargs)-> torch.Tensor:
+        return self.get_rewards(self.toxicity_clf1, self.tokenizer_clf1, completions, device=kwargs['device'])
 
-    def get_rewards_classifier_2(self, prompts: List[str], completions: List[str], **kwargs) -> List[float]:
-        return self.get_rewards(self.toxicity_clf2, self.tokenizer_clf2, completions)
+
+    def get_rewards_classifier_2(self, prompts: List[str], completions: List[str], **kwargs) -> torch.Tensor:
+        return self.get_rewards(self.toxicity_clf2, self.tokenizer_clf2, completions, device=kwargs['device'])
