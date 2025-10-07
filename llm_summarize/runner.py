@@ -1,13 +1,16 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from config.config import MainConfig
 from hydra.utils import instantiate
+from llm_summarize.utils.peft_patches import apply_peft_patches
 import logging
 import os
 import wandb
 from huggingface_hub import login
 
-
 log = logging.getLogger(__name__)
+
+apply_peft_patches()
+
 
 def _init_environment():
     """Authenticate Hugging Face and W&B safely, with logging."""

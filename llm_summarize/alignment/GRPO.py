@@ -7,6 +7,7 @@ from config.config import MainConfig
 from hydra.utils import instantiate
 from llm_summarize.alignment.custom_inference_callback import InferenceCallback
 from llm_summarize.utils.utils import extract_text_from_html
+from omegaconf import OmegaConf
 
 
 def run_GRPO(base_model: AutoModelForCausalLM,
@@ -15,7 +16,9 @@ def run_GRPO(base_model: AutoModelForCausalLM,
              dataset: Dataset,
              config: MainConfig) -> str:
 
-    lora_config = instantiate(config.grpo_lora)
+    lora_config_dict = OmegaConf.to_container(config.grpo_lora, resolve=True)
+    lora_config = instantiate(lora_config_dict)
+
     train_config = instantiate(config.grpo_train)
 
     tokenizer.chat_template = "{{ messages[0]['content'] }}"
@@ -36,7 +39,8 @@ def run_GRPO(base_model: AutoModelForCausalLM,
 
     inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
 
-    small_dataset = dataset.select(range(1000))
+    # small_dataset = dataset.select(range(1000))
+    small_dataset = dataset.select(range(50))
 
     trainer = GRPOTrainer(
         model=align_model,

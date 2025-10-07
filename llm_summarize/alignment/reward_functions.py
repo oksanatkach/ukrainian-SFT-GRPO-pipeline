@@ -18,7 +18,8 @@ class ToxicityClassifiers:
         return LLM(
             model=model_name,
             task=self.cfg.task,
-            enforce_eager=self.cfg.enforce_eager
+            enforce_eager=self.cfg.enforce_eager,
+            gpu_memory_utilization=self.cfg.gpu_memory_utilization
         )
 
     def get_rewards(self, classifier: LLM, tokenizer, completions: List[str]) -> List[float]:

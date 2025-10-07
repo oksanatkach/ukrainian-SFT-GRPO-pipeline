@@ -5,13 +5,9 @@ from hydra.utils import instantiate
 from config.config import MainConfig
 import logging
 from datasets import Dataset
-from llm_summarize.utils.peft_patches import apply_peft_patches
 from omegaconf import OmegaConf
 
-
 log = logging.getLogger(__name__)
-
-apply_peft_patches()
 
 
 def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -> str:
