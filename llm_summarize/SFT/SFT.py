@@ -5,13 +5,24 @@ from hydra.utils import instantiate
 from config.config import MainConfig
 import logging
 from datasets import Dataset
+from llm_summarize.utils.peft_patches import apply_peft_patches
+from omegaconf import OmegaConf
 
 
 log = logging.getLogger(__name__)
 
+apply_peft_patches()
+
+
 def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -> str:
-    lora_config = instantiate(config.sft_lora)
-    train_config = instantiate(config.sft_train)
+    lora_config_dict = OmegaConf.to_container(config.sft_lora, resolve=True)
+    lora_config = instantiate(lora_config_dict)
+
+    # Force convert target_modules to plain list
+    if hasattr(lora_config, 'target_modules'):
+        lora_config.target_modules = list(lora_config.target_modules)
+
+    train_config = instantiate(OmegaConf.to_container(config.sft_train, resolve=True))
 
     # Initialize wandb
     wandb.init(

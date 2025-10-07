@@ -47,7 +47,7 @@ _init_environment()
 
 
 def run_pipeline(config: MainConfig) -> None:
-    from llm_summarize.utils import set_seed
+    from llm_summarize.utils.utils import set_seed
     set_seed(config.seed)
 
     # 1) Data preparation

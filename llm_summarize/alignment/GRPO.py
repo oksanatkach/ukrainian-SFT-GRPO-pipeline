@@ -6,7 +6,7 @@ from llm_summarize.alignment.reward_functions import ToxicityClassifiers
 from config.config import MainConfig
 from hydra.utils import instantiate
 from llm_summarize.alignment.custom_inference_callback import InferenceCallback
-from llm_summarize.utils import extract_text_from_html
+from llm_summarize.utils.utils import extract_text_from_html
 
 
 def run_GRPO(base_model: AutoModelForCausalLM,
