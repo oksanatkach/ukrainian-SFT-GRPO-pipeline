@@ -18,7 +18,7 @@ class GRPOConfigBase:
     # gradient_checkpointing_kwargs: Optional[Dict] = {"use_reentrant": True}
 
     per_device_train_batch_size: int = 2
-    gradient_accumulation_steps: int = 16
+    gradient_accumulation_steps: int = 2
     per_device_eval_batch_size: int = 1
 
     # generation params
