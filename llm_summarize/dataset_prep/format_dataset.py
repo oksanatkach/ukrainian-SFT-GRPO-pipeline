@@ -1,4 +1,3 @@
-import torch
 from datasets import load_dataset, Dataset
 from transformers import AutoTokenizer
 from typing import Tuple
@@ -28,10 +27,10 @@ def formatting_func(row, tokenizer, max_length=2048, special_tokens_buffer=5):
 
     # Return tokenized data (SFTTrainer will detect "input_ids" and skip tokenization)
     return {
-        "input_ids": torch.tensor(input_ids),
-        "completion_mask": torch.tensor(completion_mask),
+        "input_ids": input_ids,
+        "completion_mask": completion_mask,
         "prompt_text": prompt_text,
-        "prompt_ids": torch.tensor(prompt_ids)
+        "prompt_ids": prompt_ids
     }
 
 def format_ds(dataset: Dataset,
@@ -39,7 +38,7 @@ def format_ds(dataset: Dataset,
               max_seq_length: int,
               special_tokens_buffer: int,
               cpu_workers: int = 1):
-    return dataset.map(
+    formatted_dataset = dataset.map(
         formatting_func,
         fn_kwargs={"tokenizer": tokenizer,
                    "max_length": max_seq_length,
@@ -48,6 +47,10 @@ def format_ds(dataset: Dataset,
         remove_columns=["title", "text", "url"],
         num_proc=cpu_workers
     )
+    formatted_dataset.set_format(type="pt",
+                                 columns=["input_ids", "completion_mask", "prompt_ids"],
+                                 output_all_columns=True)
+    return formatted_dataset
 
 def format_ds_for_GRPO(dataset: Dataset, cpu_workers: int = 1):
     '''
@@ -71,8 +74,8 @@ def get_dataset(dataset_name: str,
     format_ds_kwargs.pop("dataset_name")
 
     try:
-        train_dataset = load_dataset(dataset_name, "ukrainian", split="train")
-        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation")
+        train_dataset = load_dataset(dataset_name, "ukrainian", split="train[:1%]")
+        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation[:1%]")
     except Exception as e:
         log.error(f"Failed to load model: {e}")
         raise  # critical, cannot continue
