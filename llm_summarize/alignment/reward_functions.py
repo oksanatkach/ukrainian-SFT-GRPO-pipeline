@@ -23,6 +23,7 @@ class ToxicityClassifiers:
         input_ids = tokenizer(completions,
                               max_length=self.cfg.max_input_len,
                               truncation=True,
+                              padding=True,
                               return_tensors="pt")["input_ids"]
         output = classifier.classify(input_ids)
         output = [el.outputs.probs for el in output]
