@@ -26,10 +26,7 @@ class GRPOConfigBase:
     temperature: float = 0.8
     max_completion_length: int = 256
     max_prompt_length: int = 512
-
-    num_iterations: int = 1
     num_train_epochs: int = 1
-
     logging_steps: int = 10
     save_strategy: str = "steps"
     save_steps: int = 100
