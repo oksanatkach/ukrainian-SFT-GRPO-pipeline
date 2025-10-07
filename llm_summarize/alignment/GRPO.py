@@ -36,11 +36,13 @@ def run_GRPO(base_model: AutoModelForCausalLM,
 
     inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
 
+    small_dataset = dataset.select(range(1000))
+
     trainer = GRPOTrainer(
         model=align_model,
         reward_funcs=[classifiers.get_rewards_classifier_1, classifiers.get_rewards_classifier_2],
         args=train_config,
-        train_dataset=dataset,
+        train_dataset=small_dataset,
         processing_class=tokenizer,
         callbacks=[inference_callback]
     )

@@ -15,17 +15,17 @@ class GRPOConfigBase:
     output_dir: str = "./outputs/GRPO"
     bf16: bool = True
 
-    per_device_train_batch_size: int = 4
-    gradient_accumulation_steps: int = 2
+    per_device_train_batch_size: int = 2
+    gradient_accumulation_steps: int = 1
     per_device_eval_batch_size: int = 1
 
     # generation params
-    num_generations: int = 4
+    num_generations: int = 2
     temperature: float = 0.8
-    max_completion_length: int = 256
+    max_completion_length: int = 128
     max_prompt_length: int = 512
     num_train_epochs: int = 1
-    logging_steps: int = 10
+    logging_steps: int = 50
     save_strategy: str = "steps"
     save_steps: int = 100
     save_total_limit: int = 2
