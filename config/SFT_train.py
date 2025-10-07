@@ -40,7 +40,7 @@ class SFTConfigBase:
     load_best_model_at_end: bool = True
     metric_for_best_model: str = "rouge_l"
     greater_is_better: bool = True
-    save_strategy: str  = "epoch"
+    save_strategy: str  = "steps"
 
     dataset_kwargs: Optional[Dict] = field(default_factory=lambda: {
                 "add_special_tokens": False,  # We template with special tokens
