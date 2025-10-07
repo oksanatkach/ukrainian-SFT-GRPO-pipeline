@@ -1,37 +1,54 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from datasets import Dataset
 from trl import GRPOTrainer, GRPOConfig
+from peft import PeftModel
 from llm_summarize.alignment.reward_functions import ToxicityClassifiers
 from config.config import MainConfig
 from hydra.utils import instantiate
-from omegaconf import OmegaConf
+from llm_summarize.alignment.custom_inference_callback import InferenceCallback
+from llm_summarize.utils import extract_text_from_html
 
 
-def run_GRPO(best_model_path: str, dataset: Dataset, config: MainConfig) -> str:
-    tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
-    tokenizer.pad_token_id = tokenizer.eos_token_id
-    tokenizer.padding_side = "left"
+def run_GRPO(model: AutoModelForCausalLM,
+             tokenizer: AutoTokenizer,
+             best_checkpoint_path: str,
+             dataset: Dataset,
+             config: MainConfig) -> str:
+
     tokenizer.chat_template = "{{ messages[0]['content'] }}"
 
+    # Load LoRA adapter
+    model = PeftModel.from_pretrained(model, best_checkpoint_path)
+
+    # Merge LoRA weights into base model
+    model = model.merge_and_unload()
+
     training_args: GRPOConfig = instantiate(config.grpo_train)
-    model_init_kwargs = OmegaConf.to_container(config.model)
-    model_init_kwargs.pop("model_name")
-    training_args.model_init_kwargs = model_init_kwargs
 
     classifiers = ToxicityClassifiers(cfg=config.reward_classifier)
 
+    dirty_urls = [
+        "https://sigwait.gitlab.io/les_podervyansky--plays/ch07.html",
+        "https://sigwait.gitlab.io/les_podervyansky--plays/ch08.html",
+        "https://sigwait.gitlab.io/les_podervyansky--plays/ch14.html",
+        "https://sigwait.gitlab.io/les_podervyansky--plays/ch22.html"
+    ]
+    test_prompts = [extract_text_from_html(url) for url in dirty_urls]
+    test_prompts = [f"Підсумуй цей текст: {el}" for el in test_prompts]
+
+    inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
+
     trainer = GRPOTrainer(
-        model=best_model_path,
+        model=model,
         reward_funcs=[classifiers.get_rewards_classifier_1, classifiers.get_rewards_classifier_2],
         args=training_args,
         train_dataset=dataset,
-        processing_class=tokenizer
+        processing_class=tokenizer,
+        callbacks=[inference_callback]
     )
 
     trainer.train()
     final_model_path = f"{config.grpo_train.output_dir}/final_best_model"
     trainer.save_model(final_model_path)
-
-    # todo: sanity check
 
     return final_model_path

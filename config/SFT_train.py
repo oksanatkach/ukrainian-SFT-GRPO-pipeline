@@ -23,22 +23,24 @@ class SFTConfigBase:
     packing: Optional[bool] = False # Use packing dataset_prep creating
     gradient_checkpointing: Optional[bool] = True # Enables gradient checkpointing
     gradient_checkpointing_kwargs: Optional[Dict] = field(default_factory=lambda: {"use_reentrant": False})
-    max_steps: int = 2500 # How many optimizer update steps to take
     warmup_ratio: float = 0.03 #Fraction of steps to do a warmup for
-    save_steps: int = 500 # Save checkpoint every X updates steps
     save_total_limit: int = 3  # Keep only best 3 checkpoints to save space
-    logging_steps: int = 100
-    eval_steps: int = 500
     eval_strategy: str  = "steps"
     logging_strategy: str  = "steps"
     report_to: List[str] = field(default_factory=lambda: ["wandb"])
     logging_first_step: bool = True
 
+    num_train_epochs: int = 3
+    max_steps: int = -1
+    save_steps: int = 350 # Save checkpoint every X updates steps
+    logging_steps: int = 50
+    eval_steps: int = 175
+
     # Model selection parameters:
     load_best_model_at_end: bool = True
     metric_for_best_model: str = "rouge_l"
     greater_is_better: bool = True
-    save_strategy: str  = "steps"
+    save_strategy: str  = "epoch"
 
     dataset_kwargs: Optional[Dict] = field(default_factory=lambda: {
                 "add_special_tokens": False,  # We template with special tokens

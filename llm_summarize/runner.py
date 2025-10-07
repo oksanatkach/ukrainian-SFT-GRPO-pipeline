@@ -1,5 +1,6 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from config.config import MainConfig
+from hydra.utils import instantiate
 import logging
 import os
 import wandb
@@ -53,6 +54,7 @@ def run_pipeline(config: MainConfig) -> None:
     log.info(f"Loading tokenizer {config.model.model_name}")
     tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
     tokenizer.pad_token_id = tokenizer.eos_token_id
+    tokenizer.padding_side = "left"
 
     log.info(f"Formatting dataset {config.dataset.dataset_name}")
     from llm_summarize.dataset_prep import format_dataset
@@ -64,7 +66,18 @@ def run_pipeline(config: MainConfig) -> None:
         cpu_workers=config.cpu_workers
     )
 
-    # 2) SFT
+    # 2) Load base model
+    quantization_config = instantiate(config.quantization)
+    model = AutoModelForCausalLM.from_pretrained(
+        config.model.model_name,
+        quantization_config=quantization_config,
+        dtype = config.model.dtype,
+        attn_implementation=config.model.attn_implementation,
+        device_map=config.model.device_map
+    )
+    model.gradient_checkpointing_enable()
+
+    # 3) SFT
     if config.run.do_sft:
         log.info(f"Initializing SFT on model {config.model.model_name}")
 
@@ -73,7 +86,8 @@ def run_pipeline(config: MainConfig) -> None:
 
         from llm_summarize.SFT import run_SFT
 
-        config.best_fst_model = run_SFT(train_dataset=train_dataset_formatted,
+        config.best_fst_model = run_SFT(model=model,
+                                        train_dataset=train_dataset_formatted,
                                         eval_dataset=eval_dataset_formatted,
                                         config=config)
         log.info(f"Finished SFT, final model path:\t{config.best_fst_model}")
@@ -92,7 +106,9 @@ def run_pipeline(config: MainConfig) -> None:
         grpo_dataset = format_ds_for_GRPO(dataset=train_dataset_formatted, cpu_workers=config.cpu_workers)
 
         # pass last checkpoint path or model object
-        config.best_grpo_model = run_GRPO(best_model_path=config.best_fst_model,
+        config.best_grpo_model = run_GRPO(model=model,
+                                          tokenizer=tokenizer,
+                                          best_checkpoint_path=config.best_fst_model,
                                           dataset=grpo_dataset,
                                           config=config)
         log.info(f"Finished alignment, final model path:\t{config.best_grpo_model}")

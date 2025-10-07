@@ -65,15 +65,14 @@ def get_dataset(dataset_name: str,
                 max_seq_length: int,
                 special_tokens_buffer: int,
                 cpu_workers: int) -> Tuple[Dataset, Dataset]:
+
     # a neater and more concise way to pass arguments
     format_ds_kwargs = locals().copy()
     format_ds_kwargs.pop("dataset_name")
-    try:
-        # train_dataset = load_dataset(dataset_name, "ukrainian", split="train")
-        # eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation")
 
-        train_dataset = load_dataset(dataset_name, "ukrainian", split="train[:1%]")
-        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation[:1%]")
+    try:
+        train_dataset = load_dataset(dataset_name, "ukrainian", split="train")
+        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation")
     except Exception as e:
         log.error(f"Failed to load model: {e}")
         raise  # critical, cannot continue
