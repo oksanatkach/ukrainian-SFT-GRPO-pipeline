@@ -1,4 +1,4 @@
-from transformers import AutoModelForCausalLM, EarlyStoppingCallback
+from transformers import AutoModelForCausalLM, EarlyStoppingCallback, AutoTokenizer
 from llm_summarize.SFT.custom_sfttrainer import CustomSFTTrainer
 import wandb
 from hydra.utils import instantiate
@@ -12,7 +12,11 @@ log = logging.getLogger(__name__)
 apply_peft_patches()
 
 
-def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: Dataset, config: MainConfig) -> str:
+def run_SFT(model: AutoModelForCausalLM,
+            tokenizer: AutoTokenizer,
+            train_dataset: Dataset,
+            eval_dataset: Dataset,
+            config: MainConfig) -> str:
     lora_config_dict = OmegaConf.to_container(config.sft_lora, resolve=True)
     lora_config = instantiate(lora_config_dict)
 
@@ -33,10 +37,10 @@ def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: D
         early_stopping_patience=config.early_stopping.early_stopping_patience,
         early_stopping_threshold=config.early_stopping.early_stopping_threshold,
     )
-    model.get_tokenizer().pad_token_id = model.get_tokenizer().eos_token_id
-    model.get_tokenizer().padding_side = "left"
+
     trainer = CustomSFTTrainer(
         model=model,
+        processing_class=tokenizer,
         args=train_config,
         custom_metrics_args=config.custom_metrics,
         train_dataset=train_dataset,

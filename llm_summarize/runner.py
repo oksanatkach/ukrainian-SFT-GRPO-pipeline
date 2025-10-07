@@ -87,6 +87,7 @@ def run_pipeline(config: MainConfig) -> None:
         from llm_summarize.SFT import run_SFT
 
         config.best_fst_model = run_SFT(model=model,
+                                        tokenizer=tokenizer,
                                         train_dataset=train_dataset_formatted,
                                         eval_dataset=eval_dataset_formatted,
                                         config=config)
