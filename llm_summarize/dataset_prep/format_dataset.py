@@ -74,8 +74,8 @@ def get_dataset(dataset_name: str,
     format_ds_kwargs.pop("dataset_name")
 
     try:
-        train_dataset = load_dataset(dataset_name, "ukrainian", split="train[:1%]")
-        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation[:1%]")
+        train_dataset = load_dataset(dataset_name, "ukrainian", split="train")
+        eval_dataset = load_dataset(dataset_name, "ukrainian", split="validation")
     except Exception as e:
         log.error(f"Failed to load model: {e}")
         raise  # critical, cannot continue

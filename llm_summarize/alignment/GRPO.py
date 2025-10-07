@@ -44,8 +44,7 @@ def run_GRPO(base_model: AutoModelForCausalLM,
 
     inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
 
-    # small_dataset = dataset.select(range(1000))
-    small_dataset = dataset.select(range(50))
+    small_dataset = dataset.select(range(config.dataset.alignment_subset_size))
 
     trainer = GRPOTrainer(
         model=align_model,
