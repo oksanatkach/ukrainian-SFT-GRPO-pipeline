@@ -33,7 +33,8 @@ def run_SFT(model: AutoModelForCausalLM, train_dataset: Dataset, eval_dataset: D
         early_stopping_patience=config.early_stopping.early_stopping_patience,
         early_stopping_threshold=config.early_stopping.early_stopping_threshold,
     )
-
+    model.get_tokenizer().pad_token_id = model.get_tokenizer().eos_token_id
+    model.get_tokenizer().padding_side = "left"
     trainer = CustomSFTTrainer(
         model=model,
         args=train_config,
