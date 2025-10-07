@@ -1,6 +1,7 @@
 from vllm import LLM
 from typing import List
 from config.reward_classifier import RewardClassifierConfig
+from vllm import TokensPrompt
 
 class ToxicityClassifiers:
     def __init__(self, cfg: RewardClassifierConfig):
@@ -22,10 +23,9 @@ class ToxicityClassifiers:
     def get_rewards(self, classifier: LLM, tokenizer, completions: List[str]) -> List[float]:
         input_ids = tokenizer(completions,
                               max_length=self.cfg.max_input_len,
-                              truncation=True,
-                              padding=True,
-                              return_tensors="pt")["input_ids"]
-        output = classifier.classify(input_ids)
+                              truncation=True)["input_ids"]
+        input = [TokensPrompt(prompt_token_ids=el) for el in input_ids]
+        output = classifier.classify(input)
         output = [el.outputs.probs for el in output]
         return [el[0] - el[1] for el in output]
 
