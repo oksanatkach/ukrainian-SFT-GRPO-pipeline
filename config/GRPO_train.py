@@ -27,8 +27,6 @@ class GRPOConfigBase:
     max_completion_length: int = 256
     max_prompt_length: int = 512
 
-    kl_ctrl: Dict = field(default_factory=lambda: {'kl_coef': 0.05})
-
     num_iterations: int = 1
     num_train_epochs: int = 1
 
