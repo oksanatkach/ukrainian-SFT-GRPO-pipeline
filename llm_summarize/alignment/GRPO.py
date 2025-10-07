@@ -7,7 +7,12 @@ from config.config import MainConfig
 from hydra.utils import instantiate
 from llm_summarize.alignment.custom_inference_callback import InferenceCallback
 from llm_summarize.utils.utils import extract_text_from_html
+import logging
 from omegaconf import OmegaConf
+from llm_summarize.utils.peft_patches import apply_peft_patches
+
+log = logging.getLogger(__name__)
+apply_peft_patches()
 
 
 def run_GRPO(base_model: AutoModelForCausalLM,
