@@ -106,7 +106,7 @@ def run_pipeline(config: MainConfig) -> None:
         grpo_dataset = format_ds_for_GRPO(dataset=train_dataset_formatted, cpu_workers=config.cpu_workers)
 
         # pass last checkpoint path or model object
-        config.best_grpo_model = run_GRPO(model=model,
+        config.best_grpo_model = run_GRPO(base_model=model,
                                           tokenizer=tokenizer,
                                           best_checkpoint_path=config.best_fst_model,
                                           dataset=grpo_dataset,
