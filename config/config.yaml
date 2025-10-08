@@ -7,6 +7,7 @@ defaults:
   - sft_train: adam
   - grpo_train: adam
   - run: default
-  - early_stopping: default
+  - sft_early_stopping: default
+  - grpo_early_stopping: default
   - custom_metrics: default
   - _self_  # Keep overrides from this file last
