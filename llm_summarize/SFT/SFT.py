@@ -34,8 +34,8 @@ def run_SFT(model: AutoModelForCausalLM,
     )
 
     early_stopping_callback = EarlyStoppingCallback(
-        early_stopping_patience=config.early_stopping.early_stopping_patience,
-        early_stopping_threshold=config.early_stopping.early_stopping_threshold,
+        early_stopping_patience=config.sft_early_stopping.early_stopping_patience,
+        early_stopping_threshold=config.sft_early_stopping.early_stopping_threshold,
     )
 
     trainer = CustomSFTTrainer(

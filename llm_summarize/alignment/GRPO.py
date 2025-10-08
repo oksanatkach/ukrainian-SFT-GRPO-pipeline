@@ -43,7 +43,9 @@ def run_GRPO(base_model: AutoModelForCausalLM,
     test_prompts = [extract_text_from_html(url) for url in dirty_urls]
     test_prompts = [f"Підсумуй цей текст: {el}" for el in test_prompts]
 
-    inference_callback = InferenceCallback(test_prompts, tokenizer, every_n_steps=100)
+    inference_callback = InferenceCallback(test_prompts,
+                                           tokenizer,
+                                           every_n_steps=config.grpo_early_stopping.inference_callback_freq)
 
     small_dataset = dataset.select(range(config.dataset.alignment_subset_size))
 
@@ -55,8 +57,8 @@ def run_GRPO(base_model: AutoModelForCausalLM,
         processing_class=tokenizer,
         callbacks=[
             inference_callback,
-            EarlyStoppingCallback(patience=5),
-            KLDivergenceEarlyStoppingCallback(max_kl=0.5)
+            EarlyStoppingCallback(patience=config.grpo_early_stopping.early_stopping_patience),
+            KLDivergenceEarlyStoppingCallback(max_kl=config.grpo_early_stopping.max_kl_divergence)
         ]
     )
 

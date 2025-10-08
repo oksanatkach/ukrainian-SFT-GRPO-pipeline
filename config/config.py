@@ -12,7 +12,7 @@ from config.reward_classifier import RewardClassifierConfig
 from config.GRPO_train import GRPOConfigBase
 from config.model import ModelConfig
 from config.dataset import DatasetConfig
-from config.early_stopping import EarlyStoppingConfig
+from config.early_stopping import SFTEarlyStoppingConfig, GRPOEarlyStoppingConfig
 from config.custom_metrics import (CustomMetricsConfig,
                                    CustomMetricsROUGEConfig,
                                    CustomMetricsBLEUConfig,
@@ -31,7 +31,8 @@ class MainConfig:
     grpo_train: GRPOConfigBase = MISSING
     run: RunConfig = field(default_factory=RunConfig)
     reward_classifier: RewardClassifierConfig = field(default_factory=RewardClassifierConfig)
-    early_stopping: EarlyStoppingConfig = field(default_factory=EarlyStoppingConfig)
+    sft_early_stopping: SFTEarlyStoppingConfig = field(default_factory=SFTEarlyStoppingConfig)
+    grpo_early_stopping: GRPOEarlyStoppingConfig = field(default_factory=GRPOEarlyStoppingConfig)
     custom_metrics: CustomMetricsConfig = field(default_factory=CustomMetricsConfig)
 
     wandb_project_name: str = "gemma_FST"
@@ -70,7 +71,10 @@ def register_configs():
 
     cs.store(group="quantization", name="default", node=QuantizationConfig)
     cs.store(group="dataset", name="default", node=DatasetConfig)
-    cs.store(group="early_stopping", name="default", node=EarlyStoppingConfig)
+
+    cs.store(group="sft_early_stopping", name="default", node=SFTEarlyStoppingConfig)
+    cs.store(group="grpo_early_stopping", name="default", node=GRPOEarlyStoppingConfig)
+
     cs.store(group="run", name="default", node=RunConfig)
     cs.store(group="reward_classifier", name="default", node=RewardClassifierConfig)
     cs.store(group="model", name="default", node=ModelConfig)
