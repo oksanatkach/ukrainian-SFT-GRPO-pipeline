@@ -40,7 +40,8 @@ class CustomSFTTrainer(SFTTrainer):
             "prompt_ids": pad_sequence(
                 [torch.tensor(el['prompt_ids']) for el in batch],
                 batch_first=True,
-                padding_value=self.processing_class.pad_token_id
+                padding_value=self.processing_class.pad_token_id,
+                padding_side="left"
             ),
             "labels": [el['summary'] for el in batch]
         }
