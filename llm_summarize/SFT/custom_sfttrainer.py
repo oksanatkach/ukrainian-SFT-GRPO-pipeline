@@ -36,14 +36,16 @@ class CustomSFTTrainer(SFTTrainer):
         self.custom_metrics_args = custom_metrics_args
 
     def get_prompts_tensor(self, batch):
+        prompt_ids = pad_sequence([torch.tensor(el["prompt_ids"]) for el in batch],
+                                  batch_first=True,
+                                  padding_value=0,
+                                  padding_side="right"
+                            )
+        attention_mask = (prompt_ids != 0).long()
         return {
-            "prompt_ids": pad_sequence(
-                [torch.tensor(el['prompt_ids']) for el in batch],
-                batch_first=True,
-                padding_value=0,
-                padding_side="left"
-            ),
-            "labels": [el['summary'] for el in batch]
+            "prompt_ids": prompt_ids,
+            "attention_mask": attention_mask,
+            "labels": [el["summary"] for el in batch]
         }
 
     def evaluate(
@@ -100,9 +102,11 @@ class CustomSFTTrainer(SFTTrainer):
 
         for batch in val_subset_loader:
             prompts_tensor = batch['prompt_ids'].to(self.model.device)
+            attention_mask = batch['attention_mask'].to(self.model.device)
             with torch.no_grad():
                 generated_ids = self.model.generate(
                     input_ids=prompts_tensor,
+                    attention_mask=attention_mask,
                     max_new_tokens=self.custom_metrics_args.max_new_tokens
                 )
             pred_ids = generated_ids[:, prompts_tensor.shape[1]:]
