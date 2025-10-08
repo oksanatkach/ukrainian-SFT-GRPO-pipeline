@@ -10,6 +10,7 @@ from llm_summarize.utils.utils import extract_text_from_html
 import logging
 from omegaconf import OmegaConf
 from llm_summarize.utils.peft_patches import apply_peft_patches
+from llm_summarize.alignment.early_stopping_callbacks import EarlyStoppingCallback, KLDivergenceEarlyStoppingCallback
 
 log = logging.getLogger(__name__)
 apply_peft_patches()
@@ -52,7 +53,11 @@ def run_GRPO(base_model: AutoModelForCausalLM,
         args=train_config,
         train_dataset=small_dataset,
         processing_class=tokenizer,
-        callbacks=[inference_callback]
+        callbacks=[
+            inference_callback,
+            EarlyStoppingCallback(patience=5),
+            KLDivergenceEarlyStoppingCallback(max_kl=0.5)
+        ]
     )
 
     trainer.train()
