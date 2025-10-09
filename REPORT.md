@@ -64,6 +64,12 @@ I don't think this is the most elegant solution, but it works as intended and al
 
 The other solution would be to re-write all configs into yaml format and forego typing and validation.
 
+### Versioning
+The `datasets` library had to be downgraded in order to load `csebuetnlp/xlsum` since it requires the use of a dataset script which is not supported in the latest `datasets` version.
+
+The latest version of PEFT has a bug with the config being converted into a non json serializable object, but `Trainer` needs to convert the config into json.
+I had to fix this by adding a patch in `llm_summarize/utils/perft_patches.py`. Maybe in later versions this won't be needed.
+
 ### Out of Scope
 - Advanced summarization data setup
 - Model testing
